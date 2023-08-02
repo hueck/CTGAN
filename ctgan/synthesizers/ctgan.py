@@ -1,5 +1,5 @@
 """CTGAN module."""
-
+import os
 import warnings
 
 import numpy as np
@@ -416,6 +416,14 @@ class CTGAN(BaseSynthesizer):
                 print(f'Epoch {i+1}, Loss G: {loss_g.detach().cpu(): .4f},'  # noqa: T001
                       f'Loss D: {loss_d.detach().cpu(): .4f}',
                       flush=True)
+
+            if int(os.environ["SAVE_MODEL_EPOCHS"]) > 0:
+                if (i + 1) % int(os.environ["SAVE_MODEL_EPOCHS"]) == 0:
+                    torch.save(self, os.environ["DIR_MODEL_SAVE"] + "/" + str(i + 1) + "_epochs.pkl")
+                    print("model saved at epoch: " + str(i + 1))
+            else:
+                if i == epochs - 1:
+                    torch.save(self, (os.environ["DIR_MODEL_SAVE"] + "/final_model" + ".pkl"))
 
     @random_state
     def sample(self, n, condition_column=None, condition_value=None):
